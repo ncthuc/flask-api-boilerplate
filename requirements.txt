@@ -1,0 +1,4 @@
+Flask==1.0.2
+python-dotenv~=0.10.1
+flask-restplus==0.12.1
+pytest-flask==0.10.0
