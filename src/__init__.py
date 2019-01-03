@@ -11,6 +11,7 @@ def create_app(config_name):
     import config
     import logging.config
     from src.api import init_api
+    from src.model import init_model
 
     print("Starting in `{}` mode...".format(config_name))
 
@@ -20,4 +21,5 @@ def create_app(config_name):
     logging.config.fileConfig(app.config['LOGGING_CONFIG_FILE'], disable_existing_loggers=False)
 
     init_api(app)
+    init_model(app)
     return app

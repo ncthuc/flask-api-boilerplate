@@ -19,7 +19,7 @@ api = Api(
     validate=False
 )
 
-api.add_namespace(user_ns, path='/user')
+api.add_namespace(user_ns, path='/users')
 api.add_namespace(hello_ns, path='/hello')
 
 
