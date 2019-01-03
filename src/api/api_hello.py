@@ -2,26 +2,28 @@
 import logging
 from werkzeug.exceptions import Unauthorized
 
-from src.api import api
-from src.api.api_base import BaseApi
-from flask_restplus import Resource, fields
+from flask_restplus import Resource, Namespace
+
+from src.helpers.response_helper import api_response
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
 
+ns = Namespace('hello', description='Hello operations')
 
-@api.route('/hello', methods=['GET'])
-class HelloApi(Resource, BaseApi):
+
+@ns.route('', methods=['GET'])
+class HelloApi(Resource):
     """
     Hello world api
     """
     def get(self):
         _logger.info('Hello world API')
-        return BaseApi.api_response('Hello world', 'ok', 200)
+        return api_response('Hello world', 'ok', 200)
 
 
-@api.route('/ex0', methods=['GET'])
-class Exception0Api(Resource, BaseApi):
+@ns.route('/ex0', methods=['GET'])
+class Exception0Api(Resource):
     """
     Exception api
     """
@@ -29,8 +31,8 @@ class Exception0Api(Resource, BaseApi):
         1/0
 
 
-@api.route('/ex1', methods=['GET'])
-class Exception1Api(Resource, BaseApi):
+@ns.route('/ex1', methods=['GET'])
+class Exception1Api(Resource):
     """
     Exception api
     """
@@ -38,8 +40,8 @@ class Exception1Api(Resource, BaseApi):
         raise ValueError('Value error exception!')
 
 
-@api.route('/ex2', methods=['GET'])
-class Exception2Api(Resource, BaseApi):
+@ns.route('/ex2', methods=['GET'])
+class Exception2Api(Resource):
     """
     Exception api
     """
