@@ -2,6 +2,7 @@
 import logging
 
 from flask import Flask
+from flask_debugtoolbar import DebugToolbarExtension
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
@@ -22,4 +23,8 @@ def create_app(config_name):
 
     init_api(app)
     init_model(app)
+
+    # app.config['DEBUG_TB_PROFILER_ENABLED'] = True
+    # toolbar = DebugToolbarExtension(app)
+    # toolbar.init_app(app)
     return app

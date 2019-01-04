@@ -20,8 +20,8 @@ api = Api(
     # doc='' # disable Swagger UI
 )
 
-api.add_namespace(user_ns, path='/user')
-api.add_namespace(hello_ns, path='/hello')
+api.add_namespace(user_ns)
+api.add_namespace(hello_ns, path='/hello') # path default to namespace's name
 
 api.error_handlers[Exception] = global_error_handler
 
