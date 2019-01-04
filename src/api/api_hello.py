@@ -5,7 +5,7 @@ from werkzeug.exceptions import Unauthorized
 from flask_restplus import Resource
 from src.extensions.namespace import Namespace
 
-from src.helpers.response_helper import api_response
+from src.extensions.response_wrapper import wrap_response
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ class HelloApi(Resource):
     """
     def get(self):
         _logger.info('Hello world API')
-        return api_response('Hello world', 'ok', 200)
+        return wrap_response('Hello world', 'ok', 200)
 
 
 @ns.route('/ex0', methods=['GET'])

@@ -2,9 +2,8 @@
 import logging
 from flask_restplus import Api
 from flask import Blueprint
-from werkzeug.exceptions import HTTPException as BaseHTTPException
 
-from src.extensions.exceptions import HTTPException
+from src.extensions.exceptions import global_error_handler
 from .api_user import ns as user_ns
 from .api_hello import ns as hello_ns
 
@@ -23,17 +22,7 @@ api = Api(
 api.add_namespace(user_ns, path='/user')
 api.add_namespace(hello_ns, path='/hello')
 
-
-@api.errorhandler(Exception)
-def default_error_handler(e):
-    # traceback.print_exc()
-    code = 500
-    errors = None
-    if isinstance(e, BaseHTTPException):
-        code = e.code
-    if isinstance(e, HTTPException):
-        errors = e.errors
-    return {'success': False, 'message': str(e), 'code': code, 'errors': errors}, code
+api.error_handlers[Exception] = global_error_handler
 
 
 def init_api(app, **kwargs):

@@ -1,4 +1,4 @@
-def api_response(data=None, message="", http_code=200):
+def wrap_response(data=None, message="", http_code=200):
     """ Return general HTTP response
     :param int http_code:
     :param str message: detail info

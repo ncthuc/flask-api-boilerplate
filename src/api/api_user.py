@@ -2,12 +2,10 @@
 import logging
 
 from flask import request
-from flask_restplus import Resource, fields, marshal_with
-from webargs import fields as f
-from webargs.flaskparser import use_args
+from flask_restplus import Resource
 
 from src.extensions.namespace import Namespace
-from src.helpers.response_helper import api_response
+from src.extensions.response_wrapper import wrap_response
 from src.model.user import User, UserSchema
 
 __author__ = 'ThucNC'
@@ -31,10 +29,11 @@ class UserApi(Resource):
 
     @ns.doc(description='Create an user')
     @ns.expect(_user_post, validate=True)
-    @ns.marshal_with(_user)
+    @ns.marshal_list_with(_user)
     def post(self):
         data = request.json
         user = User(**data)
         # user.password = data['password']
-        return user
+        # return user
+        return [user]
 
