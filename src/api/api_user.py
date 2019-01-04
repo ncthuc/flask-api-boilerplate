@@ -23,7 +23,6 @@ class UserApi(Resource):
     """
     Hello world api
     """
-
     @ns.expect(RequestHelper.pagination_params, validate=True)
     def get(self):
         _logger.warn('User API: {}')

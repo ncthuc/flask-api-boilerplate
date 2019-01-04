@@ -41,10 +41,13 @@ class UserSchema:
     user = {
         'email': fields.String(required=True, description='user email address'),
         'username': fields.String(required=True, description='user username'),
-        'password_hash': fields.String(required=False, description='user password'),
+        'password_hash': fields.String(required=False, description='user password hash'),
     }
 
     user_post = user.copy()
     user_post.update({
         'password': fields.String(required=True, description='user password'),
+        'fullname': fields.String(required=False, description='user full name'),
+        'image': fields.String(required=False, description='user avatar'),
+        'role': fields.String(required=False, description='user role (admin | moderator | viewer)'),
     })
