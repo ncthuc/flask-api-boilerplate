@@ -1,7 +1,7 @@
 # coding=utf-8
 import logging
 
-from flask_marshmallow import Marshmallow
+from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
 migrate = Migrate(db=db)
-ma = Marshmallow()
+bcrypt = Bcrypt()
 
 
 def init_model(app, **kwargs):
@@ -22,6 +22,6 @@ def init_model(app, **kwargs):
     db.app = app
     db.init_app(app)
     migrate.init_app(app)
-    ma.init_app(app)
+    bcrypt.init_app(app)
 
     from src.model.user import User

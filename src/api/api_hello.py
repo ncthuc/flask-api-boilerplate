@@ -2,7 +2,8 @@
 import logging
 from werkzeug.exceptions import Unauthorized
 
-from flask_restplus import Resource, Namespace
+from flask_restplus import Resource
+from src.extensions.namespace import Namespace
 
 from src.helpers.response_helper import api_response
 
