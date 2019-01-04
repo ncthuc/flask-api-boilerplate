@@ -6,6 +6,7 @@ from flask_restplus import Resource
 
 from src.extensions.namespace import Namespace
 from src.extensions.response_wrapper import wrap_response
+from src.helpers.request_helper import RequestHelper
 from src.model.user import User, UserSchema
 
 __author__ = 'ThucNC'
@@ -22,10 +23,13 @@ class UserApi(Resource):
     """
     Hello world api
     """
+
+    @ns.expect(RequestHelper.pagination_params, validate=True)
     def get(self):
         _logger.warn('User API: {}')
-        # return api_response(request.args, 'ok', 200)
-        return request.args, 200
+        args = RequestHelper.pagination_params.parse_args()
+        # args = request.args
+        return wrap_response(args, 'ok', 200)
 
     @ns.doc(description='Create an user')
     @ns.expect(_user_post, validate=True)

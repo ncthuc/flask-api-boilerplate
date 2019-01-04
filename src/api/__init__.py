@@ -16,7 +16,8 @@ api = Api(
     app=api_bp,
     version='1.0',
     title='Boilerplate API',
-    validate=False
+    validate=False,
+    # doc='' # disable Swagger UI
 )
 
 api.add_namespace(user_ns, path='/user')

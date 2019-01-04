@@ -1,10 +1,11 @@
-from flask_restplus._http import HTTPStatus as BaseHTTPStatus
 from werkzeug.exceptions import HTTPException as BaseHTTPException
+
+from src.extensions.response_wrapper import wrap_response
 
 
 class HTTPException(BaseHTTPException):
-    def __init__(self, code=400, message=None, response=None, errors=None):
-        super().__init__(description=message, response=response)
+    def __init__(self, code=400, message=None, errors=None):
+        super().__init__(description=message, response=None)
         self.code = code
         self.errors = errors
 
@@ -17,4 +18,7 @@ def global_error_handler(e):
         code = e.code
     if isinstance(e, HTTPException):
         errors = e.errors
-    return {'success': False, 'message': str(e), 'code': code, 'errors': errors}, code
+    res = wrap_response(None, str(e), code)
+    if errors:
+        res[0]['errors'] = errors
+    return res
