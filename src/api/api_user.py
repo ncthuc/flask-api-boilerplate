@@ -31,7 +31,7 @@ class Users(Resource):
         args = RequestHelper.pagination_params.parse_args()
         # return wrap_response(args, 'ok', 200)
         res = User.query.offset((args['page']-1) * args['pageSize']).limit(args['pageSize']).all()
-        print(flask_sqlalchemy.get_debug_queries())
+        # print(flask_sqlalchemy.get_debug_queries())
         return res
 
     @ns.expect(_user_post, validate=True)

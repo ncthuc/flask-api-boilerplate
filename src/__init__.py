@@ -13,6 +13,7 @@ def create_app(config_name):
     import logging.config
     from src.api import init_api
     from src.model import init_model
+    from src.commands import init_command
 
     print("Starting in `{}` mode...".format(config_name))
 
@@ -23,6 +24,7 @@ def create_app(config_name):
 
     init_api(app)
     init_model(app)
+    init_command(app)
 
     # app.config['DEBUG_TB_PROFILER_ENABLED'] = True
     # toolbar = DebugToolbarExtension(app)
