@@ -24,4 +24,6 @@ def init_model(app, **kwargs):
     migrate.init_app(app)
     bcrypt.init_app(app)
 
-    from src.model.user import User
+
+from src.model.user import User
+

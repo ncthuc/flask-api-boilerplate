@@ -27,7 +27,6 @@ class Users(Resource):
         """
             Get list of user
         """
-        _logger.warn('User API: {}')
         args = RequestHelper.pagination_params.parse_args()
         # return wrap_response(args, 'ok', 200)
         res = User.query.offset((args['page']-1) * args['pageSize']).limit(args['pageSize']).all()
@@ -42,8 +41,6 @@ class Users(Resource):
         """
         data = request.json
         user = User.create_user(data)
-        # user.password = data['password']
-        # return user
         return user
 
 

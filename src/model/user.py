@@ -21,6 +21,11 @@ class User(db.Model, Timestamp):
     last_login = db.Column(db.DateTime(), default=datetime.datetime.now)
 
     @property
+    def to_dict(self):
+        return {col.name: getattr(self, col.name) for col in
+                self.__table__.columns}
+
+    @property
     def password(self):
         raise AttributeError('password: write-only field')
 
@@ -39,10 +44,13 @@ class User(db.Model, Timestamp):
         return True
 
     @staticmethod
-    def create_user(data):
+    def create_user(data, commit=True):
         new_user = User(**data)
         db.session.add(new_user)
-        db.session.commit()
+        if commit:
+            db.session.commit()
+        else:
+            db.session.flush()
         return new_user
 
     @staticmethod

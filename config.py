@@ -5,8 +5,6 @@ import dotenv
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 dotenv.load_dotenv(os.path.join(basedir, '../../.env'))
-# print('###########')
-# print(os.environ)
 
 ETC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'etc'))
 

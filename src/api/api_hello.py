@@ -19,6 +19,10 @@ class HelloApi(Resource):
     Hello world api
     """
     def get(self):
+        """
+        Get hello message
+        :return:
+        """
         _logger.info('Hello world API')
         return wrap_response('Hello world', 'ok', 200)
 
@@ -29,6 +33,10 @@ class Exception0Api(Resource):
     Exception api
     """
     def get(self):
+        """
+        Raise ZeroDivisionError exception
+        :return:
+        """
         1/0
 
 
@@ -38,6 +46,10 @@ class Exception1Api(Resource):
     Exception api
     """
     def get(self):
+        """
+        Raise ValueError exception
+        :return:
+        """
         raise ValueError('Value error exception!')
 
 
@@ -47,6 +59,10 @@ class Exception2Api(Resource):
     Exception api
     """
     def get(self):
+        """
+        Raise Unauthorized exception
+        :return:
+        """
         raise Unauthorized("Login required!")
 
 
