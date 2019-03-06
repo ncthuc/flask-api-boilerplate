@@ -1,8 +1,8 @@
 import datetime
 
 from flask_restplus import fields
-from sqlalchemy import or_
-from werkzeug.exceptions import NotFound
+from sqlalchemy import or_, update
+from werkzeug.exceptions import NotFound, Conflict
 
 from src.model import db, bcrypt
 from src.model.base_model import Timestamp
@@ -52,6 +52,24 @@ class User(db.Model, Timestamp):
         else:
             db.session.flush()
         return new_user
+
+    @staticmethod
+    def update_user(username, data):
+        user = db.session.query(User).filter(User.username == username).first_or_404()
+        if data['email'] != user.email:
+            conflict = User.query.filter(User.email == data['email']).first()
+            if conflict:
+                raise Conflict('Email %s is existed' % data['email'])
+        for key, value in data.items():
+            setattr(user, key, value)
+        db.session.flush()
+        return user
+
+    @staticmethod
+    def delete_user(username):
+        user = db.session.query(User).filter(User.username == username).first_or_404()
+        db.session.delete(user)
+        db.session.flush()
 
     @staticmethod
     def find(user_id):
@@ -113,3 +131,7 @@ class UserSchema:
     user_post.update({
         'password': fields.String(required=True, description='user password'),
     })
+
+    user_put = user_post.copy()
+    user_put.pop('username', None)
+    user_put.pop('password', None)

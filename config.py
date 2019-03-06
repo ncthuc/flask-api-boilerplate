@@ -15,6 +15,7 @@ class Config:
     DEBUG = False
     BABEL_TRANSLATION_DIRECTORIES = '../translations'
     LANGUAGES = ['en', 'vi']
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
 
 class DevelopmentConfig(Config):

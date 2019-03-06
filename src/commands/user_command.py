@@ -22,3 +22,4 @@ def create_user(name):
 def set_password(email, name, password):
     _logger.info(f"Setting new password for user `{name}` to `{password}`, "
                  f"email notification = {email}")
+
