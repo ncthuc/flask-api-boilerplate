@@ -1,4 +1,4 @@
-def wrap_response(data=None, metadata=None, message="", http_code=200):
+def wrap_response(data=None, message="", http_code=200, metadata=None):
     """ Return general HTTP response
     :param data:
     :param metadata:

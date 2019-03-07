@@ -77,7 +77,7 @@ class marshal_with(object):
                 if isinstance(resp, dict) and 'metadata' in resp:
                     return (
                         wrap_response(marshal(resp['data'], self.fields, self.envelope, self.skip_none, mask, self.ordered),
-                                      marshal(resp['metadata'], self.metadata))
+                                      metadata=marshal(resp['metadata'], self.metadata))
                     )
                 else:
                     return wrap_response(marshal(resp, self.fields, self.envelope, self.skip_none, mask, self.ordered))
