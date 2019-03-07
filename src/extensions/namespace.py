@@ -44,7 +44,7 @@ class Namespace(OriginalNamespace):
 class marshal_with(object):
     """A decorator that apply marshalling to the return values of your methods.
     """
-    def __init__(self, fields, envelope=None, skip_none=False, mask=None, ordered=False):
+    def __init__(self, fields, metadata=None, envelope=None, skip_none=False, mask=None, ordered=False):
         """
         :param fields: a dict of whose keys will make up the final
                        serialized response output
@@ -52,6 +52,7 @@ class marshal_with(object):
                          response
         """
         self.fields = fields
+        self.metadata = metadata
         self.envelope = envelope
         self.skip_none = skip_none
         self.ordered = ordered
@@ -68,10 +69,16 @@ class marshal_with(object):
             if isinstance(resp, tuple):
                 data, code, headers = unpack(resp)
                 return (
-                    wrap_response(marshal(data, self.fields, self.envelope, self.skip_none, mask, self.ordered)),
-                    code,
-                    headers
+                    wrap_response(marshal(data, self.fields, self.envelope,
+                                          self.skip_none, mask, self.ordered)),
+                    code, headers
                 )
             else:
-                return wrap_response(marshal(resp, self.fields, self.envelope, self.skip_none, mask, self.ordered))
+                if isinstance(resp, dict) and 'metadata' in resp:
+                    return (
+                        wrap_response(marshal(resp['data'], self.fields, self.envelope, self.skip_none, mask, self.ordered),
+                                      marshal(resp['metadata'], self.metadata))
+                    )
+                else:
+                    return wrap_response(marshal(resp, self.fields, self.envelope, self.skip_none, mask, self.ordered))
         return wrapper

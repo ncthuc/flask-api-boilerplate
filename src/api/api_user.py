@@ -1,9 +1,8 @@
 # coding=utf-8
 import logging
 
-import flask_sqlalchemy
 from flask import request
-from flask_restplus import Resource
+from flask_restplus import Resource, fields
 
 from src.extensions.namespace import Namespace
 from src.extensions.response_wrapper import wrap_response
@@ -18,22 +17,32 @@ ns = Namespace('users', description='User operations')
 _user = ns.model('user', UserSchema.user)
 _user_post = ns.model('user_post', UserSchema.user_post)
 _user_put = ns.model('user_put', UserSchema.user_put)
+_metadata = ns.model('metadata', {
+    'current_page': fields.Integer(),
+    'page_size': fields.Integer(),
+    'total_items': fields.Integer(),
+    'next_page': fields.Integer(),
+    'previous_page': fields.Integer(),
+    'total_pages': fields.Integer()
+})
 
 
 @ns.route('/', methods=['GET', 'POST'])
 @ns.route('/<int:username>', methods=['DELETE', 'PUT'])
 class Users(Resource):
-    @ns.expect(RequestHelper.get_list_user_arguments, validate=True)
-    @ns.marshal_list_with(_user)
+    @ns.expect(RequestHelper.get_list_user_arguments(), validate=True)
+    @ns.marshal_with(_user, True, metadata=_metadata)
     def get(self):
         """
             Get list of user
         """
         args = RequestHelper.get_list_user_arguments().parse_args()
-        # return wrap_response(args, 'ok', 200)
-        res = User.query.offset((args['page']-1) * args['pageSize']).limit(args['pageSize']).all()
+        page = args['page']
+        page_size = args['pageSize']
+        res = User.query.offset((page - 1) * page_size).limit(page_size).all()
         # print(flask_sqlalchemy.get_debug_queries())
-        return res
+        return {'data': res,
+                'metadata': Users.pagination(page, page_size, len(res))}
 
     @ns.expect(_user_post, validate=True)
     @ns.marshal_with(_user)
@@ -44,6 +53,24 @@ class Users(Resource):
         data = request.json
         user = User.create_user(data)
         return user
+
+    @staticmethod
+    def pagination(page, page_size, total_items):
+        """
+        Pagination for creating metadata
+        """
+        total_pages = total_items // page_size if total_items % page_size == 0 \
+            else (total_items // page_size) + 1
+        next_page = page + 1 if page < total_pages - 1 else None
+        previous_page = page - 1 if page > 1 else None
+        return {
+            'current_page': page,
+            'page_size': page_size,
+            'total_items': total_items,
+            'next_page': next_page,
+            'previous_page': previous_page,
+            'total_pages': total_pages
+        }
 
 
 @ns.route('/<int:user_id>', methods=['GET', 'PUT'])

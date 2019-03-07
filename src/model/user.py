@@ -1,7 +1,7 @@
 import datetime
 
 from flask_restplus import fields
-from sqlalchemy import or_, update
+from sqlalchemy import or_
 from werkzeug.exceptions import NotFound, Conflict
 
 from src.model import db, bcrypt
