@@ -13,7 +13,7 @@ fake = Faker()
 class UserProvider(faker.providers.BaseProvider):
     @staticmethod
     def user(name=None, fullname=None, email=None, password=None, role=None,
-             commit=True):
+             commit=False):
         """
         Fake an user in db for testing
         :return: user model object
@@ -38,10 +38,9 @@ class UserProvider(faker.providers.BaseProvider):
         """
         number = number or random.randint(2, 10)
         if not data:
-            users = [UserProvider.user(commit=False) for i in range(number)]
+            users = [UserProvider.user() for i in range(number)]
         else:
-            users = [UserProvider.user(user_info, commit=False)
-                     for user_info in data]
+            users = [UserProvider.user(user_info) for user_info in data]
         model.db.session.commit()
         return users
 

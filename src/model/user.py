@@ -44,7 +44,7 @@ class User(db.Model, Timestamp):
         return True
 
     @staticmethod
-    def create_user(data, commit=True):
+    def create_user(data, commit=False):
         new_user = User(**data)
         db.session.add(new_user)
         if commit:

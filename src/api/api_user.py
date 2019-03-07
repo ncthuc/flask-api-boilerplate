@@ -8,6 +8,7 @@ from src.extensions.namespace import Namespace
 from src.extensions.response_wrapper import wrap_response
 from src.helpers.request_helper import RequestHelper
 from src.model.user import User, UserSchema
+from werkzeug.exceptions import Conflict
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
@@ -51,6 +52,9 @@ class Users(Resource):
             Create a new user
         """
         data = request.json
+        user = User.query.filter(User.username == data['username']).first()
+        if user:
+            raise Conflict('Username %s is existed' % data['username'])
         user = User.create_user(data)
         return user
 

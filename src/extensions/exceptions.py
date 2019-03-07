@@ -1,6 +1,7 @@
 from werkzeug.exceptions import HTTPException as BaseHTTPException
 
 from src.extensions.response_wrapper import wrap_response
+from src.model import db
 
 
 class HTTPException(BaseHTTPException):
@@ -19,6 +20,7 @@ def global_error_handler(e):
     if isinstance(e, HTTPException):
         errors = e.errors
     res = wrap_response(None, str(e), code)
+    db.session.rollback()
     if errors:
         res[0]['errors'] = errors
     return res
