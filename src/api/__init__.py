@@ -21,7 +21,7 @@ api = Api(
 )
 
 api.add_namespace(user_ns)
-api.add_namespace(hello_ns, path='/hello') # path default to namespace's name
+api.add_namespace(hello_ns, path='/hello')  # path default to namespace's name
 
 api.error_handlers[Exception] = global_error_handler
 

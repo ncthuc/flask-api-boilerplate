@@ -44,7 +44,7 @@ class Namespace(OriginalNamespace):
 class marshal_with(object):
     """A decorator that apply marshalling to the return values of your methods.
     """
-    def __init__(self, fields, envelope=None, skip_none=False, mask=None, ordered=False):
+    def __init__(self, fields, metadata=None, envelope=None, skip_none=False, mask=None, ordered=False):
         """
         :param fields: a dict of whose keys will make up the final
                        serialized response output
@@ -52,6 +52,7 @@ class marshal_with(object):
                          response
         """
         self.fields = fields
+        self.metadata = metadata
         self.envelope = envelope
         self.skip_none = skip_none
         self.ordered = ordered
@@ -61,17 +62,29 @@ class marshal_with(object):
         @wraps(f)
         def wrapper(*args, **kwargs):
             resp = f(*args, **kwargs)
-            mask = self.mask
-            if has_app_context():
-                mask_header = current_app.config['RESTPLUS_MASK_HEADER']
-                mask = request.headers.get(mask_header) or mask
             if isinstance(resp, tuple):
                 data, code, headers = unpack(resp)
+                print(code)
                 return (
-                    wrap_response(marshal(data, self.fields, self.envelope, self.skip_none, mask, self.ordered)),
-                    code,
-                    headers
+                    self.wrap_response_with_data(data, code), code, headers
                 )
             else:
-                return wrap_response(marshal(resp, self.fields, self.envelope, self.skip_none, mask, self.ordered))
+                return self.wrap_response_with_data(resp)
         return wrapper
+
+    def wrap_response_with_data(self, resp, code=200):
+        mask = self.mask
+        if has_app_context():
+            mask_header = current_app.config['RESTPLUS_MASK_HEADER']
+            mask = request.headers.get(mask_header) or mask
+        if isinstance(resp, dict) and all(k in resp for k in ['metadata', 'data']):
+            return (
+                wrap_response(marshal(resp['data'], self.fields,
+                                      self.envelope, mask),
+                              metadata=marshal(resp['metadata'], self.metadata),
+                              http_code=code)
+            )
+        else:
+            return wrap_response(marshal(resp, self.fields,
+                                         self.envelope, mask),
+                                 http_code=code)

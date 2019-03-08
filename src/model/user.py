@@ -2,7 +2,7 @@ import datetime
 
 from flask_restplus import fields
 from sqlalchemy import or_
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Conflict
 
 from src.model import db, bcrypt
 from src.model.base_model import Timestamp
@@ -19,6 +19,11 @@ class User(db.Model, Timestamp):
     role = db.Column(db.Enum('admin', 'moderator', 'viewer'),
                      nullable=False, default='viewer')
     last_login = db.Column(db.DateTime(), default=datetime.datetime.now)
+
+    @property
+    def to_dict(self):
+        return {col.name: getattr(self, col.name) for col in
+                self.__table__.columns}
 
     @property
     def password(self):
@@ -39,11 +44,32 @@ class User(db.Model, Timestamp):
         return True
 
     @staticmethod
-    def create_user(data):
+    def create_user(data, commit=False):
         new_user = User(**data)
         db.session.add(new_user)
-        db.session.commit()
+        if commit:
+            db.session.commit()
+        else:
+            db.session.flush()
         return new_user
+
+    @staticmethod
+    def update_user(username, data):
+        user = db.session.query(User).filter(User.username == username).first_or_404()
+        if data['email'] != user.email:
+            conflict = User.query.filter(User.email == data['email']).first()
+            if conflict:
+                raise Conflict('Email %s is existed' % data['email'])
+        for key, value in data.items():
+            setattr(user, key, value)
+        db.session.flush()
+        return user
+
+    @staticmethod
+    def delete_user(username):
+        user = db.session.query(User).filter(User.username == username).first_or_404()
+        db.session.delete(user)
+        db.session.flush()
 
     @staticmethod
     def find(user_id):
@@ -105,3 +131,7 @@ class UserSchema:
     user_post.update({
         'password': fields.String(required=True, description='user password'),
     })
+
+    user_put = user_post.copy()
+    user_put.pop('username', None)
+    user_put.pop('password', None)

@@ -1,6 +1,7 @@
-def wrap_response(data=None, message="", http_code=200):
+def wrap_response(data=None, message="", http_code=200, metadata=None):
     """ Return general HTTP response
     :param data:
+    :param metadata:
     :param str message: detail info
     :param int http_code:
     :return:
@@ -13,4 +14,6 @@ def wrap_response(data=None, message="", http_code=200):
 
     if data is not None:
         res['data'] = data
+    if metadata:
+        res['metadata'] = metadata
     return res, http_code
