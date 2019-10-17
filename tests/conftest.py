@@ -16,7 +16,7 @@ def app(request):
     :param request:
     :return: flask app
     """
-    from main import app
+    from app import app
 
     ctx = app.app_context()
     ctx.push()
