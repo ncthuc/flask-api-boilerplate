@@ -55,7 +55,7 @@ class Users(Resource):
         user = User.query.filter(User.username == data['username']).first()
         if user:
             raise Conflict('Username %s is existed' % data['username'])
-        user = User.create_user(data)
+        user = User.create(data)
         return user
 
     @staticmethod
@@ -77,7 +77,7 @@ class Users(Resource):
         }
 
 
-@ns.route('/<int:user_id>', methods=['GET', 'PUT'])
+@ns.route('/<int:_id>', methods=['GET', 'PUT'])
 class UserByID(Resource):
     """
     Manipulations with a specific user.
@@ -88,7 +88,7 @@ class UserByID(Resource):
         """
         Get user details by ID.
         """
-        return User.find(user_id)
+        return User.get(user_id)
 
 
 @ns.route('/<string:username>', methods=['GET', 'PUT', 'DELETE'])
