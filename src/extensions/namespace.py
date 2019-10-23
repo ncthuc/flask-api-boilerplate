@@ -1,3 +1,5 @@
+# coding=utf-8
+import logging
 from functools import wraps
 
 from flask import has_app_context, current_app, request
@@ -7,6 +9,9 @@ from flask_restplus.utils import merge, unpack
 
 from src.extensions.model import Model, OrderedModel
 from src.extensions.response_wrapper import wrap_response
+
+__author__ = 'ThucNC'
+_logger = logging.getLogger(__name__)
 
 
 class Namespace(OriginalNamespace):
@@ -64,7 +69,6 @@ class marshal_with(object):
             resp = f(*args, **kwargs)
             if isinstance(resp, tuple):
                 data, code, headers = unpack(resp)
-                print(code)
                 return (
                     self.wrap_response_with_data(data, code), code, headers
                 )
@@ -78,13 +82,9 @@ class marshal_with(object):
             mask_header = current_app.config['RESTPLUS_MASK_HEADER']
             mask = request.headers.get(mask_header) or mask
         if isinstance(resp, dict) and all(k in resp for k in ['metadata', 'data']):
-            return (
-                wrap_response(marshal(resp['data'], self.fields,
-                                      self.envelope, mask),
-                              metadata=marshal(resp['metadata'], self.metadata),
-                              http_code=code)
-            )
+            return wrap_response(marshal(resp['data'], self.fields, self.envelope, mask),
+                                 metadata=marshal(resp['metadata'], self.metadata),
+                                 http_code=code)
         else:
-            return wrap_response(marshal(resp, self.fields,
-                                         self.envelope, mask),
+            return wrap_response(marshal(resp, self.fields, self.envelope, mask),
                                  http_code=code)

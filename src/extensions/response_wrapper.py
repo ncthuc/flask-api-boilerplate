@@ -1,3 +1,10 @@
+# coding=utf-8
+import logging
+
+__author__ = 'ThucNC'
+_logger = logging.getLogger(__name__)
+
+
 def wrap_response(data=None, message="", http_code=200, metadata=None):
     """ Return general HTTP response
     :param data:
@@ -16,4 +23,4 @@ def wrap_response(data=None, message="", http_code=200, metadata=None):
         res['data'] = data
     if metadata:
         res['metadata'] = metadata
-    return res, http_code
+    return res
