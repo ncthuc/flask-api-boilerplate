@@ -55,3 +55,17 @@ Open the following url on your browser to view swagger documentation
 
 ## Contributing
 If you want to contribute to this boilerplate, clone the repository and just start making pull requests.
+
+
+## Testing
+### PyCharm
+
+- Create a `.env` file in `./tests` folder and config `DATABASE_URL` to your test database
+- Add a run/debug configuration: Python Tests > pytest
+- In Configuration tab, choose Scrip Path as Target and point to `./tests` folder 
+- In EnvFile tab, Add `./tests/.env`
+- Click run 
+
+### Console
+
+ 

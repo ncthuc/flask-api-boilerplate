@@ -8,7 +8,7 @@ __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
 
 
-def create_app(env_name):
+def create_app():
     import config
     import logging.config
     from src.api import init_api
@@ -16,9 +16,9 @@ def create_app(env_name):
     from src.commands import init_command
 
     app = Flask(__name__)
-    app.config.from_object(config.config_by_name[env_name])
+    app.config.from_object(config.Config)
     logging.config.fileConfig(app.config['LOGGING_CONFIG_FILE'], disable_existing_loggers=False)
-    _logger.info("Starting in `{}` mode...".format(env_name))
+    _logger.info("Starting application...")
 
     init_api(app)
     init_model(app)
