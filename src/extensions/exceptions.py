@@ -22,5 +22,5 @@ def global_error_handler(e):
     res = wrap_response(None, str(e), code)
     db.session.rollback()
     if errors:
-        res[0]['errors'] = errors
+        res['errors'] = errors
     return res

@@ -1,6 +1,6 @@
 # coding=utf-8
 import logging
-from flask_restplus import Api
+from flask_restx import Api
 from flask import Blueprint
 
 from src.extensions.exceptions import global_error_handler

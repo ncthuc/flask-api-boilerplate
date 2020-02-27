@@ -2,7 +2,7 @@
 import logging
 
 from flask import request
-from flask_restplus import Resource, fields
+from flask_restx import Resource, fields
 
 from src.extensions.namespace import Namespace
 from src.extensions.response_wrapper import wrap_response
@@ -31,18 +31,18 @@ _metadata = ns.model('metadata', {
 @ns.route('/', methods=['GET', 'POST'])
 @ns.route('/<int:username>', methods=['DELETE', 'PUT'])
 class Users(Resource):
-    @ns.expect(RequestHelper.get_list_user_arguments(), validate=True)
+    @ns.expect(RequestHelper.add_pagination_params(), validate=True)
     @ns.marshal_with(_user, True, metadata=_metadata)
     def get(self):
         """
             Get list of user
         """
-        args = RequestHelper.get_list_user_arguments().parse_args()
+        args = RequestHelper.add_pagination_params().parse_args()
         page = args['page']
         page_size = args['pageSize']
         res = User.query.offset((page - 1) * page_size).limit(page_size).all()
         # print(flask_sqlalchemy.get_debug_queries())
-        raise BadRequest("bad bad bad")
+        # raise BadRequest("bad bad bad")
         return {'data': res,
                 'metadata': Users.pagination(page, page_size, len(res))}
 

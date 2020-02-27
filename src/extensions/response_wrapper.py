@@ -17,10 +17,9 @@ def wrap_response(data=None, message="", http_code=200, metadata=None):
         'code': http_code,
         'success': http_code // 100 == 2,
         'message': message,
+        'data': data
     }
 
-    if data is not None:
-        res['data'] = data
     if metadata:
         res['metadata'] = metadata
     return res

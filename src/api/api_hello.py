@@ -2,7 +2,9 @@
 import logging
 from werkzeug.exceptions import Unauthorized
 
-from flask_restplus import Resource
+from flask_restx import Resource
+
+from src.extensions.exceptions import HTTPException
 from src.extensions.namespace import Namespace
 
 from src.extensions.response_wrapper import wrap_response
@@ -24,7 +26,7 @@ class HelloApi(Resource):
         :return:
         """
         _logger.info('Hello world API')
-        return wrap_response('Hello world', 'ok', 200)
+        return wrap_response('Hello world', 'ok', 201)
 
 
 @ns.route('/ex0', methods=['GET'])
@@ -66,5 +68,16 @@ class Exception2Api(Resource):
         raise Unauthorized("Login required!")
 
 
+@ns.route('/ex3', methods=['GET'])
+class Exception3Api(Resource):
+    """
+    Exception api
+    """
+    def get(self):
+        """
+        Raise Unauthorized exception
+        :return:
+        """
+        raise HTTPException(400, "Login required!", {"er1": "abc", "er2": "xyz"})
 
 

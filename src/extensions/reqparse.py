@@ -1,5 +1,5 @@
 from flask import request
-from flask_restplus.reqparse import RequestParser as BaseRequestParser
+from flask_restx.reqparse import RequestParser as BaseRequestParser
 from werkzeug.exceptions import BadRequest
 
 from src.extensions.exceptions import HTTPException

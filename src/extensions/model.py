@@ -1,6 +1,6 @@
 from collections import OrderedDict, MutableMapping
 
-from flask_restplus.model import RawModel
+from flask_restx.model import RawModel
 from jsonschema import Draft4Validator
 from jsonschema.exceptions import ValidationError
 

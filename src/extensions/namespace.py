@@ -3,9 +3,9 @@ import logging
 from functools import wraps
 
 from flask import has_app_context, current_app, request
-from flask_restplus import Namespace, marshal, Mask
-from flask_restplus._http import HTTPStatus
-from flask_restplus.utils import merge, unpack
+from flask_restx import Namespace, marshal, Mask
+from flask_restx._http import HTTPStatus
+from flask_restx.utils import merge, unpack
 
 # noinspection PyUnresolvedReferences
 import src.extensions.model
@@ -73,7 +73,7 @@ class marshal_with(object):
     def wrap_response_with_data(self, resp, code=200):
         mask = self.mask
         if has_app_context():
-            mask_header = current_app.config['RESTPLUS_MASK_HEADER']
+            mask_header = current_app.config['RESTX_MASK_HEADER']
             mask = request.headers.get(mask_header) or mask
         if isinstance(resp, dict) and all(k in resp for k in ['metadata', 'data']):
             return wrap_response(marshal(resp['data'], self.fields, self.envelope, mask),

@@ -1,6 +1,6 @@
 import datetime
 
-from flask_restplus import fields
+from flask_restx import fields
 from sqlalchemy import or_
 from werkzeug.exceptions import NotFound, Conflict
 
@@ -103,7 +103,8 @@ class UserSchema:
         'username': fields.String(required=True, description='user username'),
         'fullname': fields.String(required=False, description='user full name'),
         'image': fields.String(required=False, description='user avatar'),
-        'role': fields.String(required=False, description='user role (admin | moderator | viewer)'),
+        'role': fields.String(required=False, description='user role (admin | moderator | viewer)',
+                              enum=['admin', 'moderator', 'viewer']),
         # 'password_hash': fields.String(required=False, description='user password hash'),
     }
 
