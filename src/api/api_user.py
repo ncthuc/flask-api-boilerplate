@@ -1,6 +1,7 @@
 # coding=utf-8
 import logging
 
+import flask_sqlalchemy
 from flask import request
 from flask_restx import Resource, fields
 
@@ -8,6 +9,7 @@ from src.extensions.namespace import Namespace
 from src.extensions.response_wrapper import wrap_response
 from src.helpers.request_helper import RequestHelper
 from src.helpers.response_helper import pagination
+from src.helpers.sql_helper import get_debug_queries
 from src.model.user import User, UserSchema
 from werkzeug.exceptions import Conflict, BadRequest
 
@@ -30,7 +32,7 @@ _metadata = ns.model('metadata', {
 
 
 @ns.route('/', methods=['GET', 'POST'])
-@ns.route('/<int:username>', methods=['DELETE', 'PUT'])
+@ns.route('/<string:username>', methods=['DELETE', 'PUT'])
 class Users(Resource):
     @ns.expect(RequestHelper.add_pagination_params(), validate=True)
     @ns.marshal_with(_user, True, metadata=_metadata)
@@ -40,10 +42,12 @@ class Users(Resource):
         """
         args = RequestHelper.add_pagination_params().parse_args()
         page = args['page']
+        if page < 1:
+            page = 1
         page_size = args['pageSize']
-        _pagination = User.query.paginate(page=page, per_page=page_size)
-        # print(flask_sqlalchemy.get_debug_queries())
-        # raise BadRequest("bad bad bad")
+        _pagination = User.q().paginate(page=page, per_page=page_size, error_out=False)
+        # print(get_debug_queries())
+        print("_pagination:", _pagination)
         return {'data': _pagination.items,
                 'metadata': pagination(page, page_size, _pagination.total)}
 
