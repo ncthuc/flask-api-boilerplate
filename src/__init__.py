@@ -18,7 +18,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(config.Config)
     logging.config.fileConfig(app.config['LOGGING_CONFIG_FILE'], disable_existing_loggers=False)
-    _logger.info("Starting application...")
+    _logger.info(f"Starting application, db: {config.Config.SQLALCHEMY_DATABASE_URI}")
 
     init_api(app)
     init_model(app)

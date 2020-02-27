@@ -8,7 +8,7 @@ from src.extensions.namespace import Namespace
 from src.extensions.response_wrapper import wrap_response
 from src.helpers.request_helper import RequestHelper
 from src.model.user import User, UserSchema
-from werkzeug.exceptions import Conflict
+from werkzeug.exceptions import Conflict, BadRequest
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
@@ -42,6 +42,7 @@ class Users(Resource):
         page_size = args['pageSize']
         res = User.query.offset((page - 1) * page_size).limit(page_size).all()
         # print(flask_sqlalchemy.get_debug_queries())
+        raise BadRequest("bad bad bad")
         return {'data': res,
                 'metadata': Users.pagination(page, page_size, len(res))}
 

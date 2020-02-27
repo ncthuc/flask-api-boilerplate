@@ -63,7 +63,8 @@ If you want to contribute to this boilerplate, clone the repository and just sta
 - Create a `.env` file in `./tests` folder and config `DATABASE_URL` to your test database
 - Add a run/debug configuration: Python Tests > pytest
 - In Configuration tab, choose Scrip Path as Target and point to `./tests` folder 
-- In EnvFile tab, Add `./tests/.env`
+- Set working directory to `./tests`
+- In EnvFile tab, Add `./tests/.env`, or in Environment variables, add all necessary variables
 - Click run 
 
 ### Console

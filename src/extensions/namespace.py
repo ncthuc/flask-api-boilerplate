@@ -3,29 +3,20 @@ import logging
 from functools import wraps
 
 from flask import has_app_context, current_app, request
-from flask_restplus import Namespace as OriginalNamespace, marshal, Mask
+from flask_restplus import Namespace, marshal, Mask
 from flask_restplus._http import HTTPStatus
 from flask_restplus.utils import merge, unpack
 
-from src.extensions.model import Model, OrderedModel
+# noinspection PyUnresolvedReferences
+import src.extensions.model
+
 from src.extensions.response_wrapper import wrap_response
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
 
 
-class Namespace(OriginalNamespace):
-    def model(self, name=None, model=None, mask=None, **kwargs):
-        '''
-        Register a model
-
-        .. seealso:: :class:`Model`
-        '''
-        cls = OrderedModel if self.ordered else Model
-        model = cls(name, model, mask=mask)
-        model.__apidoc__.update(kwargs)
-        return self.add_model(name, model)
-
+class NamespaceExt:
     def marshal_with(self, fields, as_list=False, code=HTTPStatus.OK, description=None, **kwargs):
         '''
         A decorator specifying the fields to use for serialization.
@@ -44,6 +35,9 @@ class Namespace(OriginalNamespace):
             func.__apidoc__ = merge(getattr(func, '__apidoc__', {}), doc)
             return marshal_with(fields, ordered=self.ordered, **kwargs)(func)
         return wrapper
+
+
+Namespace.marshal_with = NamespaceExt.marshal_with
 
 
 class marshal_with(object):
