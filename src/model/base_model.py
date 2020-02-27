@@ -18,7 +18,7 @@ class BaseModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     created_at = db.Column(db.DateTime(), default=datetime.datetime.now, nullable=False)
-    updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, nullable=False, onupdate=datetime.datetime.now)
 
     @property
     def to_dict(self):

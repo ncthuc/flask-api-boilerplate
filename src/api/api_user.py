@@ -7,6 +7,7 @@ from flask_restx import Resource, fields
 from src.extensions.namespace import Namespace
 from src.extensions.response_wrapper import wrap_response
 from src.helpers.request_helper import RequestHelper
+from src.helpers.response_helper import pagination
 from src.model.user import User, UserSchema
 from werkzeug.exceptions import Conflict, BadRequest
 
@@ -40,11 +41,11 @@ class Users(Resource):
         args = RequestHelper.add_pagination_params().parse_args()
         page = args['page']
         page_size = args['pageSize']
-        res = User.query.offset((page - 1) * page_size).limit(page_size).all()
+        _pagination = User.query.paginate(page=page, per_page=page_size)
         # print(flask_sqlalchemy.get_debug_queries())
         # raise BadRequest("bad bad bad")
-        return {'data': res,
-                'metadata': Users.pagination(page, page_size, len(res))}
+        return {'data': _pagination.items,
+                'metadata': pagination(page, page_size, _pagination.total)}
 
     @ns.expect(_user_post, validate=True)
     @ns.marshal_with(_user)
@@ -58,24 +59,6 @@ class Users(Resource):
             raise Conflict('Username %s is existed' % data['username'])
         user = User.create(data)
         return user
-
-    @staticmethod
-    def pagination(page, page_size, total_items):
-        """
-        Pagination for creating metadata
-        """
-        total_pages = total_items // page_size if total_items % page_size == 0 \
-            else (total_items // page_size) + 1
-        next_page = page + 1 if page < total_pages - 1 else None
-        previous_page = page - 1 if page > 1 else None
-        return {
-            'current_page': page,
-            'page_size': page_size,
-            'total_items': total_items,
-            'next_page': next_page,
-            'previous_page': previous_page,
-            'total_pages': total_pages
-        }
 
 
 @ns.route('/<int:_id>', methods=['GET', 'PUT'])
