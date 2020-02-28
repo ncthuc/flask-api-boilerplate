@@ -1,7 +1,6 @@
 # coding=utf-8
 import logging
 
-import flask_sqlalchemy
 from flask import request
 from flask_restx import Resource, fields
 
@@ -9,9 +8,8 @@ from src.extensions.namespace import Namespace
 from src.extensions.response_wrapper import wrap_response
 from src.helpers.request_helper import RequestHelper
 from src.helpers.response_helper import pagination
-from src.helpers.sql_helper import get_debug_queries
 from src.model.user import User, UserSchema
-from werkzeug.exceptions import Conflict, BadRequest
+from werkzeug.exceptions import Conflict
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)

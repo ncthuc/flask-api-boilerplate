@@ -3,7 +3,7 @@ import logging
 from functools import wraps
 
 from flask import has_app_context, current_app, request
-from flask_restx import Namespace, marshal, Mask
+from flask_restx import Namespace as OriginalNamespace, marshal, Mask
 from flask_restx._http import HTTPStatus
 from flask_restx.utils import merge, unpack
 
@@ -16,7 +16,7 @@ __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
 
 
-class NamespaceExt:
+class Namespace(OriginalNamespace):
     def marshal_with(self, fields, as_list=False, code=HTTPStatus.OK, description=None, **kwargs):
         '''
         A decorator specifying the fields to use for serialization.
@@ -35,9 +35,6 @@ class NamespaceExt:
             func.__apidoc__ = merge(getattr(func, '__apidoc__', {}), doc)
             return marshal_with(fields, ordered=self.ordered, **kwargs)(func)
         return wrapper
-
-
-Namespace.marshal_with = NamespaceExt.marshal_with
 
 
 class marshal_with(object):
