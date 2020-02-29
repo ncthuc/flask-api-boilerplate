@@ -3,6 +3,7 @@ import logging
 
 from flask import Flask
 # from flask_debugtoolbar import DebugToolbarExtension
+from src.api_admin import init_admin_api
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ def create_app():
     _logger.info(f"Starting application, db: {config.Config.SQLALCHEMY_DATABASE_URI}")
 
     init_api(app)
+    init_admin_api(app)
     init_model(app)
     init_command(app)
 
