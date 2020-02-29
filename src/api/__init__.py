@@ -17,6 +17,13 @@ api = Api(
     version='1.0',
     title='Boilerplate API',
     validate=False,
+    authorizations= {
+        'access-token': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'access-token'
+        }
+    }
     # doc='' # disable Swagger UI
 )
 

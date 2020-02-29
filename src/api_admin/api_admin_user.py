@@ -6,6 +6,7 @@ from flask_restx import Resource, fields
 
 from src.extensions.namespace import Namespace
 from src.extensions.response_wrapper import wrap_response
+from src.helpers import login_manager
 from src.helpers.request_helper import RequestHelper
 from src.helpers.response_helper import pagination
 from src.model.user import User, UserSchema
@@ -33,6 +34,8 @@ _metadata = ns.model('metadata', {
 class Users(Resource):
     @ns.expect(RequestHelper.add_pagination_params(), validate=True)
     @ns.marshal_with(_user, True, metadata=_metadata)
+    @login_manager.required_roles('admin')
+    @ns.doc(security='access-token')
     def get(self):
         """
             Get list of user
@@ -48,48 +51,55 @@ class Users(Resource):
         return {'data': _pagination.items,
                 'metadata': pagination(page, page_size, _pagination.total)}
 
+    @ns.marshal_with(_user)
+    @ns.expect(_user_post, validate=True)
+    @login_manager.required_roles('admin')
+    @ns.doc(security='access-token')
+    def post(self):
+        """
+            Create new user
+        """
+        data = request.json
+        # user: User = flask_login.current_user
+        return User.create(data)
 
-@ns.route('/<int:_id>', methods=['GET', 'PUT'])
-class UserByID(Resource):
+
+@ns.route('/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
+class UserSingle(Resource):
     """
     Manipulations with a specific user.
     """
 
     @ns.marshal_with(_user)
+    @login_manager.required_roles('admin')
+    @ns.doc(security='access-token')
     def get(self, user_id):
         """
         Get user details by ID.
         """
-        return User.get(user_id)
-
-
-@ns.route('/<string:username>', methods=['GET', 'PUT', 'DELETE'])
-class UserByUsernameOrEmail(Resource):
-    """
-    Manipulations with a specific user.
-    """
-
-    @ns.marshal_with(_user)
-    def get(self, username):
-        """
-        Get user details by username or email
-        """
-        return User.find_by_username_or_email(username)
+        user = User.get(user_id, error_out=True)
+        return user
 
     @ns.marshal_with(_user)
     @ns.expect(_user_put, validate=True)
-    def put(self, username):
+    @login_manager.required_roles('admin')
+    @ns.doc(security='access-token')
+    def put(self, user_id):
         """
             Update existed user
         """
         data = request.json
-        user = User.update_user(username, data)
+        user = User.get(user_id, error_out=True)
+        user.update(data)
         return user
 
     @staticmethod
-    def delete(username):
+    @login_manager.required_roles('admin')
+    @ns.doc(security='access-token')
+    def delete(self, user_id):
         """
             Update existed user
         """
-        User.delete_user(username)
+        user = User.get(user_id, error_out=True)
+        user.delete()
         return wrap_response(None, 'ok', 200)

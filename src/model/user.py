@@ -1,11 +1,19 @@
 import datetime
+import secrets
 
+import requests
+from flask import request
 from flask_restx import fields
 from sqlalchemy import or_
-from werkzeug.exceptions import NotFound, Conflict
+from werkzeug.exceptions import Conflict, Unauthorized, BadRequest
 
+from src.helpers.datetime_helper import now_plus_30_days
+from src.helpers.request_helper import RequestHelper
 from src.model import db, bcrypt
 from src.model.base_model import BaseModel
+
+
+GG_OAUTH2_USER_INFO_URL = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token="
 
 
 class User(BaseModel):
@@ -39,6 +47,64 @@ class User(BaseModel):
         return True
 
     @staticmethod
+    def get_logged_in_user(req=None, raise_on_error=True):
+        if not req:
+            req = request
+        access_token = req.headers.get('access-token')
+        if access_token:
+            token = UserToken.first(UserToken.token == access_token)
+            if token:
+                return User.get(token.user_id)
+        if raise_on_error:
+            raise Unauthorized("Unauthorized")
+        return None
+
+    @staticmethod
+    def login_with_email_or_username(email, password):
+        access_token = secrets.token_hex(16)
+        user: User = User.find_by_username_or_email(email)
+        if not user:
+            raise Unauthorized('Bad username and/or password')
+        if not user.password_hash:
+            raise BadRequest("Account haven't set password")
+        if user.check_password(password):
+            # user.update_user(email, {'token': token, 'email': email})
+            # UserToken.delete_token_by_user_id(user.id)
+            UserToken.create(data={'token': access_token, 'user_id': user.id})
+            return access_token
+        raise Unauthorized('Email or Password not correct')
+
+    @staticmethod
+    def login_with_google_token(google_token):
+        verify_token = requests.get(GG_OAUTH2_USER_INFO_URL + google_token)
+        user_info = verify_token.json()
+        print(user_info)
+        hd = user_info.get('hd')
+        # if not hd or hd not in ['studyland.edu.vn', 'ucode.vn']:
+        #     raise Unauthorized('Unauthorized email domain')
+
+        email = user_info.get('email')
+        name = user_info.get('name')
+
+        user = User.find_by_username_or_email(email, raise_error=False)
+        access_token = secrets.token_hex(16)
+        if not user:
+            data = {
+                'email': email,
+                'username': email,
+                'fullname': name,
+                'image':user_info.get('picture')
+            }
+            user = User.create(data)
+        UserToken.create({'token': access_token, 'user_id': user.id})
+        return access_token
+
+    @staticmethod
+    def logout():
+        access_token = request.headers.get('access-token')
+        UserToken.delete_token(access_token)
+
+    @staticmethod
     def create_user(data, commit=False):
         new_user = User(**data)
         db.session.add(new_user)
@@ -66,9 +132,8 @@ class User(BaseModel):
         user.delete()
         db.session.flush()
 
-
     @staticmethod
-    def find_by_username_or_email(username):
+    def find_by_username_or_email(username, raise_error=True):
         """
         Args:
             username (str)
@@ -77,8 +142,10 @@ class User(BaseModel):
             user (User) - if there is a user with a specified username and
             password, None otherwise.
         """
-        user = User.query.filter(or_(User.username==username, User.email==username)).first_or_404()
-        return user
+        user_query = User.query.filter(or_(User.username==username, User.email==username))
+        if raise_error:
+            return user_query.first_or_404()
+        return user_query.first()
 
     @staticmethod
     def find_by_email(email):
@@ -94,6 +161,24 @@ class User(BaseModel):
         if not user:
             return None
         return user
+
+
+class UserToken(BaseModel):
+    token = db.Column(db.String(255))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    expired_at = db.Column(db.DateTime, default=now_plus_30_days)
+    ip_address = db.Column(db.String(64), default=RequestHelper.get_remote_ip)
+    user_agent = db.Column(db.String(1024), default=RequestHelper.get_user_agent)
+
+    @staticmethod
+    def delete_token(token):
+        obj_token = UserToken.first(UserToken.token == token)
+        if obj_token:
+            obj_token.delete()
+
+    @staticmethod
+    def delete_token_by_user_id(user_id):
+        UserToken.q(UserToken.user_id == user_id).delete()
 
 
 class UserSchema:

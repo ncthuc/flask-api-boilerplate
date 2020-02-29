@@ -25,5 +25,5 @@ def init_model(app, **kwargs):
     bcrypt.init_app(app)
 
 
-from src.model.user import User
+from src.model.user import User, UserToken, UserSchema
 
